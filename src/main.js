@@ -49,3 +49,26 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
+
+let points = 0;
+
+function addTask() {
+    let taskInput = document.getElementById('taskInput');
+    let taskText = taskInput.value.trim();
+    if (taskText === '') return;
+    
+    let li = document.createElement('li');
+    li.innerHTML = `${taskText} <button onclick="completeTask(this)">Complete</button>`;
+    document.getElementById('taskList').appendChild(li);
+    taskInput.value = '';
+}
+
+function completeTask(button) {
+    button.parentElement.remove();
+    points += 10;
+    document.getElementById('points').textContent = points;
+}
+
+function toggleTheme() {
+    document.body.classList.toggle('dark-theme');
+}

@@ -1,12 +1,20 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Gamify</title>
-
-  </head>
-  <body>
-    <h1>Gamify</h1>
-    <p>Welcome to Gamify, an app that makes time-management fun!</p>
-  </body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gamify Yourself</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Gamify Yourself</h1>
+        <div class="points">Points: <span id="points">0</span></div>
+        <input type="text" id="taskInput" placeholder="Enter a task...">
+        <button onclick="addTask()">Add Task</button>
+        <ul id="taskList"></ul>
+        <button onclick="toggleTheme()" class="theme-btn">Toggle Theme</button>
+    </div>
+    <script src="script.js"></script>
+</body>
 </html>
