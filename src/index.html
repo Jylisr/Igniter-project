@@ -3,18 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gamify Yourself</title>
+    <title>Gamify</title>
     <link rel="stylesheet" href="index.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Gamify Yourself</h1>
-        <div class="points">Points: <span id="points">0</span></div>
-        <input type="text" id="taskInput" placeholder="Enter a task...">
-        <button onclick="addTask()">Add Task</button>
-        <ul id="taskList"></ul>
-        <button onclick="toggleTheme()" class="theme-btn">Toggle Theme</button>
+    <h1>Gamify</h1>
+    <button onclick="showModal()">Add New Todo</button>
+    <h2>Points Earned: <span id="points-counter">0</span></h2>
+    <div id="todo-list"></div>
+
+    <div class="overlay" id="overlay" onclick="hideModal()"></div>
+    <div class="modal" id="todo-modal">
+        <h2>New TODO</h2>
+        <label>Title *</label>
+        <input type="text" id="todo-title"><br>
+        <label>Description (optional)</label>
+        <input type="text" id="todo-desc"><br>
+        <label>Due Date *</label>
+        <input type="datetime-local" id="todo-date"><br>
+        <label>Points (1-5) *</label>
+        <input type="number" id="todo-points" min="1" max="5"><br>
+        <button onclick="addTodo()">Save</button>
+        <button onclick="hideModal()">Cancel</button>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
