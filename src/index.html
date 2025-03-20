@@ -9,6 +9,7 @@
 <body>
     <h1>Gamify</h1>
     <button onclick="showModal()">Add New Todo</button>
+    <button onclick="showRewardsTab()">Rewards</button>
     <h2>Points Earned: <span id="points-counter">0</span></h2>
     <div id="todo-list"></div>
 
@@ -27,6 +28,121 @@
         <button onclick="hideModal()">Cancel</button>
     </div>
 
-    <script src="script.js"></script>
+    <div id="rewards-tab" class="modal">
+        <h2>Rewards</h2>
+        <p>Points Available: <span id="points-counter-rewards">0</span></p>
+        <div id="rewards-list"></div>
+        <h3>Add New Reward</h3>
+        <input type="text" id="reward-name" placeholder="Reward Name">
+        <input type="number" id="reward-cost" placeholder="Points Cost" min="1">
+        <button onclick="addReward()">Add Reward</button>
+        <button onclick="hideRewardsTab()">Close</button>
+    </div>
+
+    <script>
+         let todos = [];
+        let totalPoints = 0;
+
+        function showModal() {
+            document.getElementById('todo-modal').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+        }
+
+        function hideModal() {
+            document.getElementById('todo-modal').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('rewards-tab').style.display = 'none';
+        }
+
+        function addTodo() {
+            const title = document.getElementById('todo-title').value;
+            const desc = document.getElementById('todo-desc').value;
+            const dueDate = document.getElementById('todo-date').value;
+            const points = parseInt(document.getElementById('todo-points').value);
+            if (!title || !dueDate || isNaN(points) || points < 1 || points > 5) return alert("Title, Due Date, and Points (1-5) are required");
+            
+            const todo = { title, desc, dueDate, points, isCompleted: false };
+            todos.push(todo);
+            renderTodos();
+            hideModal();
+        }
+
+        function toggleComplete(index) {
+            todos[index].isCompleted = !todos[index].isCompleted;
+            updatePoints();
+            renderTodos();
+        }
+
+        function updatePoints() {
+            totalPoints = todos.filter(todo => todo.isCompleted).reduce((sum, todo) => sum + todo.points, 0);
+            document.getElementById('points-counter').innerText = totalPoints;
+        }
+
+        function renderTodos() {
+            const list = document.getElementById('todo-list');
+            list.innerHTML = '';
+            todos.forEach((todo, index) => {
+                list.innerHTML += `
+                    <div class="todo-item ${todo.isCompleted ? 'completed' : ''}">
+                        <span onclick="toggleComplete(${index})">${todo.title} - ${new Date(todo.dueDate).toLocaleString()} (Points: ${todo.points})</span>
+                        <button onclick="toggleComplete(${index})">${todo.isCompleted ? 'Undo' : 'Complete'}</button>
+                    </div>
+                `;
+            });
+            updatePoints();
+        }
+
+        //rewards
+        let rewards = [];
+
+function showRewardsTab() {
+    document.getElementById('rewards-tab').style.display = 'block';
+    document.getElementById('overlay').style.display = 'block';
+    document.getElementById('points-counter-rewards').innerText = totalPoints;
+    renderRewards();
+}
+
+function hideRewardsTab() {
+    document.getElementById('rewards-tab').style.display = 'none';
+    document.getElementById('overlay').style.display = 'none';
+}
+
+function addReward() {
+    const name = document.getElementById('reward-name').value;
+    const cost = parseInt(document.getElementById('reward-cost').value);
+    
+    if (!name || isNaN(cost) || cost < 1) {
+        alert("Valid reward name and cost required!");
+        return;
+    }
+    
+    rewards.push({ name, cost });
+    renderRewards();
+}
+
+function redeemReward(index) {
+    if (totalPoints >= rewards[index].cost) {
+        totalPoints -= rewards[index].cost;
+        document.getElementById('points-counter').innerText = totalPoints;
+        document.getElementById('points-counter-rewards').innerText = totalPoints;
+        alert(`You redeemed: ${rewards[index].name}!`);
+    } else {
+        alert("Not enough points!");
+    }
+}
+
+function renderRewards() {
+    const list = document.getElementById('rewards-list');
+    list.innerHTML = '';
+    rewards.forEach((reward, index) => {
+        list.innerHTML += `
+            <div class="reward-item">
+                <span>${reward.name} - Cost: ${reward.cost} Points</span>
+                <button onclick="redeemReward(${index})">Redeem</button>
+            </div>
+        `;
+    });
+}
+    </script>
 </body>
 </html>
