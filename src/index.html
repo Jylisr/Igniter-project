@@ -6,7 +6,7 @@
     <title>Gamify</title>
     <link rel="stylesheet" href="index.css">
 </head>
-<body>
+<body onload="pageLoad()">
     <h1>Gamify</h1>
     <button onclick="showModal()">Add New Todo</button>
     <button onclick="showRewardsTab()">Rewards</button>
@@ -32,10 +32,14 @@
         <h2>Rewards</h2>
         <p>Points Available: <span id="points-counter-rewards">0</span></p>
         <div id="rewards-list"></div>
-        <h3>Add New Reward</h3>
-        <input type="text" id="reward-name" placeholder="Reward Name">
-        <input type="number" id="reward-cost" placeholder="Points Cost" min="1">
-        <button onclick="addReward()">Add Reward</button>
+        <div id="reward-form" style="display: none;">
+            <h3>Add New Reward</h3>
+            <input type="text" id="reward-name" placeholder="Reward Name">
+            <input type="number" id="reward-cost" placeholder="Points Cost" min="1">
+            <button onclick="addReward()">Save Reward</button>
+        </div>
+        <button onclick="toggleRewardForm()">Add Reward</button>
+        
         <button onclick="hideRewardsTab()">Close</button>
     </div>
 
@@ -55,28 +59,63 @@
         }
 
         function addTodo() {
-            const title = document.getElementById('todo-title').value;
-            const desc = document.getElementById('todo-desc').value;
-            const dueDate = document.getElementById('todo-date').value;
-            const points = parseInt(document.getElementById('todo-points').value);
-            if (!title || !dueDate || isNaN(points) || points < 1 || points > 5) return alert("Title, Due Date, and Points (1-5) are required");
-            
-            const todo = { title, desc, dueDate, points, isCompleted: false };
-            todos.push(todo);
-            renderTodos();
-            hideModal();
+        const title = document.getElementById('todo-title').value;
+        const desc = document.getElementById('todo-desc').value;
+        const dueDate = document.getElementById('todo-date').value;
+        const points = parseInt(document.getElementById('todo-points').value);
+
+        if (!title || !dueDate || isNaN(points) || points < 1 || points > 5) {
+            return alert("Title, Due Date, and Points (1-5) are required");
         }
 
-        function toggleComplete(index) {
-            todos[index].isCompleted = !todos[index].isCompleted;
-            updatePoints();
+        const todo = { title, desc, dueDate, points, isCompleted: false };
+        todos.push(todo);
+        saveTodos();  // Save to localStorage
+        renderTodos();
+        hideModal();
+    }
+
+function saveTodos() {
+    localStorage.setItem("todos", JSON.stringify(todos));
+}
+
+
+
+function toggleComplete(index) {
+    todos[index].isCompleted = !todos[index].isCompleted;
+
+    if (todos[index].isCompleted) {
+        totalPoints += todos[index].points;
+    } else {
+        totalPoints -= todos[index].points;
+    }
+
+    saveTodos();
+    savePoints(); 
+    updatePoints(); 
+    renderTodos();
+}
+
+
+
+
+
+    function loadTodos() {
+        const storedTodos = localStorage.getItem("todos");
+        if (storedTodos) {
+            todos = JSON.parse(storedTodos);
             renderTodos();
         }
+    }
+    
+    function updatePoints() {
+    document.getElementById('points-counter').innerText = totalPoints;
+    document.getElementById('points-counter-rewards').innerText = totalPoints;
+}
 
-        function updatePoints() {
-            totalPoints = todos.filter(todo => todo.isCompleted).reduce((sum, todo) => sum + todo.points, 0);
-            document.getElementById('points-counter').innerText = totalPoints;
-        }
+
+
+
 
         function renderTodos() {
             const list = document.getElementById('todo-list');
@@ -85,12 +124,29 @@
                 list.innerHTML += `
                     <div class="todo-item ${todo.isCompleted ? 'completed' : ''}">
                         <span onclick="toggleComplete(${index})">${todo.title} - ${new Date(todo.dueDate).toLocaleString()} (Points: ${todo.points})</span>
+                        <div class='todo_buttons'>
                         <button onclick="toggleComplete(${index})">${todo.isCompleted ? 'Undo' : 'Complete'}</button>
+                        <button onclick="deleteTodo(${index})">🗑️ Delete</button>
+                        </div>
                     </div>
                 `;
             });
             updatePoints();
         }
+
+        function deleteTodo(index) {
+    if (confirm("Are you sure you want to delete this task?")) {
+        if (todos[index].isCompleted) {
+            totalPoints -= todos[index].points;
+            savePoints();
+        }
+        
+        todos.splice(index, 1);
+        saveTodos();
+        renderTodos();
+    }
+}
+
 
         //rewards
         let rewards = [];
@@ -117,19 +173,60 @@ function addReward() {
     }
     
     rewards.push({ name, cost });
+    saveRewards();  // Save to localStorage
     renderRewards();
+
+    document.getElementById('reward-name').value = '';
+    document.getElementById('reward-cost').value = '';
+    toggleRewardForm();
 }
+
+function saveRewards() {
+    localStorage.setItem("rewards", JSON.stringify(rewards));
+}
+
+function loadRewards() {
+    const storedRewards = localStorage.getItem("rewards");
+    if (storedRewards) {
+        rewards = JSON.parse(storedRewards);
+        renderRewards();
+    }
+}
+
+function toggleRewardForm() {
+    const form = document.getElementById('reward-form');
+    form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
+}
+
 
 function redeemReward(index) {
     if (totalPoints >= rewards[index].cost) {
-        totalPoints -= rewards[index].cost;
-        document.getElementById('points-counter').innerText = totalPoints;
-        document.getElementById('points-counter-rewards').innerText = totalPoints;
+        totalPoints -= rewards[index].cost; 
+        savePoints();
+        updatePoints(); 
         alert(`You redeemed: ${rewards[index].name}!`);
     } else {
         alert("Not enough points!");
     }
 }
+
+
+function savePoints() {
+    localStorage.setItem("points", JSON.stringify(totalPoints));
+}
+
+
+function loadPoints() {
+    const storedPoints = localStorage.getItem("points");
+    if (storedPoints !== null) {
+        totalPoints = JSON.parse(storedPoints);
+    }
+    updatePoints();
+}
+
+
+
+
 
 function renderRewards() {
     const list = document.getElementById('rewards-list');
@@ -138,11 +235,31 @@ function renderRewards() {
         list.innerHTML += `
             <div class="reward-item">
                 <span>${reward.name} - Cost: ${reward.cost} Points</span>
+                <div class="reward-buttons">
                 <button onclick="redeemReward(${index})">Redeem</button>
+                <button onclick="deleteReward(${index})">🗑️ Delete</button>
+                </div>
             </div>
         `;
     });
 }
+
+function deleteReward(index) {
+    if (confirm("Are you sure you want to delete this reward?")){
+        rewards.splice(index, 1);
+        saveRewards(); 
+        renderRewards();
+    }
+}
+
+
+function pageLoad() {
+    loadTodos();
+    loadRewards();
+    loadPoints();
+    renderTodos();
+}
+
     </script>
 </body>
 </html>
