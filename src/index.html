@@ -8,13 +8,14 @@
     <link rel="icon" type="image/x-icon" href="logo.png">
 </head>
 <body onload="pageLoad()">
+
+    <div id="top-bar">
+        Your coins: <span id="points-counter">0</span>
+    </div>
     <h1 id="logo">
         
     </h1>
     <button onclick="showModal()">Add New Todo</button>
-    <div id="points-display">
-    <h2>Your coins: <span id="points-counter">0</span></h2>
-    </div>
     <div id="todo-list"></div>
 
     <div class="overlay" id="overlay" onclick="hideModal()"></div>
