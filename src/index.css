@@ -16,6 +16,22 @@
             height: 15vw;
         }
 
+        #points-display {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: black;
+            color: yellow;
+            padding: 10px 15px;
+            border: 3px solid cyan;
+            box-shadow: 3px 3px purple;
+            font-size: 16px;
+            font-weight: bold;
+            text-shadow: 2px 2px red;
+            border-radius: 5px;
+        }
+        
+
         button {
             background: blue;
             color: white;
@@ -100,4 +116,35 @@
             padding: 10px;
             font-size: 14px;
         }
+
+        #page-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: black;
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            border-top: 3px solid cyan;
+            box-shadow: 0px -4px purple;
+        }
+        
+        #page-footer button {
+            background: blue;
+            color: white;
+            border: 3px solid yellow;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+            text-transform: uppercase;
+            box-shadow: 3px 3px red;
+        }
+        
+        #page-footer button:hover {
+            background: darkblue;
+        }
+        
         

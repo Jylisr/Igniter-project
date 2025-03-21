@@ -12,9 +12,9 @@
         <img src="logo.png">
     </h1>
     <button onclick="showModal()">Add New Todo</button>
-    <button onclick="showRewardsTab()">Rewards</button>
-    <button onclick="showNotebook()">Notebook</button>
-    <h2>Points Earned: <span id="points-counter">0</span></h2>
+    <div id="points-display">
+    <h2>Your coins: <span id="points-counter">0</span></h2>
+    </div>
     <div id="todo-list"></div>
 
     <div class="overlay" id="overlay" onclick="hideModal()"></div>
@@ -26,7 +26,7 @@
         <input type="text" id="todo-desc"><br>
         <label>Due Date *</label>
         <input type="datetime-local" id="todo-date"><br>
-        <label>Points (1-5) *</label>
+        <label>Coins for completion (1-5) *</label>
         <input type="number" id="todo-points" min="1" max="5"><br>
         <button onclick="addTodo()">Save</button>
         <button onclick="hideModal()">Cancel</button>
@@ -34,7 +34,7 @@
 
     <div id="rewards-tab" class="modal">
         <h2>Rewards</h2>
-        <p>Points Available: <span id="points-counter-rewards">0</span></p>
+        <p>Coins Available: <span id="points-counter-rewards">0</span></p>
         <div id="rewards-list"></div>
         <div id="reward-form" style="display: none;">
             <h3>Add New Reward</h3>
@@ -55,6 +55,11 @@
     <button onclick="saveNote()">Save Note</button>
     <button onclick="hideNotebook()">Close</button>
 </div>
+
+<footer id="page-footer">
+    <button onclick="showRewardsTab()">Rewards</button>
+    <button onclick="showNotebook()">Notebook</button>
+</footer>
 
     <script>
          let todos = [];
