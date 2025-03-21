@@ -8,8 +8,8 @@
     <link rel="icon" type="image/x-icon" href="logo.png">
 </head>
 <body onload="pageLoad()">
-    <h1>
-        <img src="logo.png">
+    <h1 id="logo">
+        
     </h1>
     <button onclick="showModal()">Add New Todo</button>
     <div id="points-display">
@@ -281,6 +281,11 @@ function pageLoad() {
     if (savedNote) {
         document.getElementById("notebook-text").value = savedNote;
     }
+
+    const logo = document.getElementById("logo")
+
+    // todo: repair image not loading in electron!!!
+    logo.innerHTML = "<img id='logo-img' src ='logo.png' alt='There should be our logo here but something is broken :('>"
 }
 
 
