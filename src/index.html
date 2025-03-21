@@ -5,11 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gamify</title>
     <link rel="stylesheet" href="index.css">
+    <link rel="icon" type="image/x-icon" href="logo.png">
 </head>
 <body onload="pageLoad()">
-    <h1>Gamify</h1>
+    <h1>
+        <img src="logo.png">
+    </h1>
     <button onclick="showModal()">Add New Todo</button>
     <button onclick="showRewardsTab()">Rewards</button>
+    <button onclick="showNotebook()">Notebook</button>
     <h2>Points Earned: <span id="points-counter">0</span></h2>
     <div id="todo-list"></div>
 
@@ -42,6 +46,15 @@
         
         <button onclick="hideRewardsTab()">Close</button>
     </div>
+
+    <div class="overlay" id="overlay-notebook" onclick="hideNotebook()"></div>
+    <div id="notebook-modal" class="modal">
+    <h2>Notebook</h2>
+    <textarea id="notebook-text" placeholder="Write your notes here..."></textarea>
+    <br>
+    <button onclick="saveNote()">Save Note</button>
+    <button onclick="hideNotebook()">Close</button>
+</div>
 
     <script>
          let todos = [];
@@ -258,7 +271,36 @@ function pageLoad() {
     loadRewards();
     loadPoints();
     renderTodos();
+
+    const savedNote = localStorage.getItem("userNote");
+    if (savedNote) {
+        document.getElementById("notebook-text").value = savedNote;
+    }
 }
+
+
+function showNotebook() {
+    document.getElementById("notebook-modal").style.display = "block";
+    document.getElementById("overlay-notebook").style.display = "block";
+    
+    // Load saved note
+    const savedNote = localStorage.getItem("userNote");
+    if (savedNote) {
+        document.getElementById("notebook-text").value = savedNote;
+    }
+}
+
+function hideNotebook() {
+    document.getElementById("notebook-modal").style.display = "none";
+    document.getElementById("overlay-notebook").style.display = "none";
+}
+
+function saveNote() {
+    const noteContent = document.getElementById("notebook-text").value;
+    localStorage.setItem("userNote", noteContent);
+    alert("Note saved!");
+}
+
 
     </script>
 </body>

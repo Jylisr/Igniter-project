@@ -11,6 +11,11 @@
             color: yellow;
             text-shadow: 3px 3px red;
         }
+
+        img {
+            height: 15vw;
+        }
+
         button {
             background: blue;
             color: white;
@@ -85,3 +90,14 @@
         .reward-buttons{
             display: flex;
         }
+
+        #notebook-modal textarea {
+            width: 90%;
+            height: 200px;
+            background: black;
+            color: limegreen;
+            border: 3px solid cyan;
+            padding: 10px;
+            font-size: 14px;
+        }
+        
