@@ -3,316 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gamify</title>
-    <link rel="stylesheet" href="index.css">
-    <link rel="icon" type="image/x-icon" href="logo.png">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="login.css">
 </head>
-<body onload="pageLoad()">
-
-    <div id="top-bar">
-        Your coins: <span id="points-counter">0</span>
+<body>
+    <div class="login-container">
+        <form class="login-form">
+            <h2>Login</h2>
+            <div class="input-group">
+                <input type="text" id="username" required>
+                <label for="username">Username</label>
+            </div>
+            <div class="input-group">
+                <input type="password" id="password" required>
+                <label for="password">Password</label>
+            </div>
+            <button type="submit" class="btn">Login</button>
+            <p class="register-link">Don't have an account? <a href="signup.html">Sign up</a></p>
+        </form>
     </div>
-    <h1 id="logo">
-        
-    </h1>
-    <button onclick="showModal()">Add New Todo</button>
-    <div id="todo-list"></div>
-
-    <div class="overlay" id="overlay" onclick="hideModal()"></div>
-    <div class="modal" id="todo-modal">
-        <h2>New TODO</h2>
-        <label>Title *</label>
-        <input type="text" id="todo-title"><br>
-        <label>Description (optional)</label>
-        <input type="text" id="todo-desc"><br>
-        <label>Due Date *</label>
-        <input type="datetime-local" id="todo-date"><br>
-        <label>Coins for completion (1-5) *</label>
-        <input type="number" id="todo-points" min="1" max="5"><br>
-        <button onclick="addTodo()">Save</button>
-        <button onclick="hideModal()">Cancel</button>
-    </div>
-
-    <div id="rewards-tab" class="modal">
-        <h2>Rewards</h2>
-        <p>Coins Available: <span id="points-counter-rewards">0</span></p>
-        <div id="rewards-list"></div>
-        <div id="reward-form" style="display: none;">
-            <h3>Add New Reward</h3>
-            <input type="text" id="reward-name" placeholder="Reward Name">
-            <input type="number" id="reward-cost" placeholder="Points Cost" min="1">
-            <button onclick="addReward()">Save Reward</button>
-        </div>
-        <button onclick="toggleRewardForm()">Add Reward</button>
-        
-        <button onclick="hideRewardsTab()">Close</button>
-    </div>
-
-    <div class="overlay" id="overlay-notebook" onclick="hideNotebook()"></div>
-    <div id="notebook-modal" class="modal">
-    <h2>Notebook</h2>
-    <textarea id="notebook-text" placeholder="Write your notes here..."></textarea>
-    <br>
-    <button onclick="saveNote()">Save Note</button>
-    <button onclick="hideNotebook()">Close</button>
-</div>
-
-<footer id="page-footer">
-    <button onclick="showRewardsTab()">Rewards</button>
-    <button onclick="showNotebook()">Notebook</button>
-</footer>
 
     <script>
-         let todos = [];
-        let totalPoints = 0;
+        document.addEventListener("DOMContentLoaded", function () {
+        document.querySelector(".login-form").addEventListener("submit", function (event) {
+        event.preventDefault();
 
-        function showModal() {
-            document.getElementById('todo-modal').style.display = 'block';
-            document.getElementById('overlay').style.display = 'block';
+        // pls we need to mechanize it better, it is stupid
+        const expectedUsername = "admin";
+        const expectedPassword = "admin";
+
+        let username = document.getElementById("username").value;
+        let password = document.getElementById("password").value;
+
+        if (username === expectedUsername && password === expectedPassword) {
+            window.location.href = "gamify.html";
+        } else {
+            alert("Invalid username or password. Please try again.");
         }
-
-        function hideModal() {
-            document.getElementById('todo-modal').style.display = 'none';
-            document.getElementById('overlay').style.display = 'none';
-            document.getElementById('rewards-tab').style.display = 'none';
-        }
-
-        function addTodo() {
-        const title = document.getElementById('todo-title').value;
-        const desc = document.getElementById('todo-desc').value;
-        const dueDate = document.getElementById('todo-date').value;
-        const points = parseInt(document.getElementById('todo-points').value);
-
-        if (!title || !dueDate || isNaN(points) || points < 1 || points > 5) {
-            return alert("Title, Due Date, and Points (1-5) are required");
-        }
-
-        const todo = { title, desc, dueDate, points, isCompleted: false };
-        todos.push(todo);
-        saveTodos();  // Save to localStorage
-        renderTodos();
-        hideModal();
-    }
-
-function saveTodos() {
-    localStorage.setItem("todos", JSON.stringify(todos));
-}
-
-
-
-function toggleComplete(index) {
-    todos[index].isCompleted = !todos[index].isCompleted;
-
-    if (todos[index].isCompleted) {
-        totalPoints += todos[index].points;
-    } else {
-        totalPoints -= todos[index].points;
-    }
-
-    saveTodos();
-    savePoints(); 
-    updatePoints(); 
-    renderTodos();
-}
-
-
-
-
-
-    function loadTodos() {
-        const storedTodos = localStorage.getItem("todos");
-        if (storedTodos) {
-            todos = JSON.parse(storedTodos);
-            renderTodos();
-        }
-    }
-    
-    function updatePoints() {
-    document.getElementById('points-counter').innerText = totalPoints;
-    document.getElementById('points-counter-rewards').innerText = totalPoints;
-}
-
-
-
-
-
-        function renderTodos() {
-            const list = document.getElementById('todo-list');
-            list.innerHTML = '';
-            todos.forEach((todo, index) => {
-                list.innerHTML += `
-                    <div class="todo-item ${todo.isCompleted ? 'completed' : ''}">
-                        <span onclick="toggleComplete(${index})">${todo.title} - ${new Date(todo.dueDate).toLocaleString()} (Points: ${todo.points})</span>
-                        <div class='todo_buttons'>
-                        <button onclick="toggleComplete(${index})">${todo.isCompleted ? 'Undo' : 'Complete'}</button>
-                        <button onclick="deleteTodo(${index})">🗑️ Delete</button>
-                        </div>
-                    </div>
-                `;
-            });
-            updatePoints();
-        }
-
-        function deleteTodo(index) {
-    if (confirm("Are you sure you want to delete this task?")) {
-        if (todos[index].isCompleted) {
-            totalPoints -= todos[index].points;
-            savePoints();
-        }
-        
-        todos.splice(index, 1);
-        saveTodos();
-        renderTodos();
-    }
-}
-
-
-        //rewards
-        let rewards = [];
-
-function showRewardsTab() {
-    document.getElementById('rewards-tab').style.display = 'block';
-    document.getElementById('overlay').style.display = 'block';
-    document.getElementById('points-counter-rewards').innerText = totalPoints;
-    renderRewards();
-}
-
-function hideRewardsTab() {
-    document.getElementById('rewards-tab').style.display = 'none';
-    document.getElementById('overlay').style.display = 'none';
-}
-
-function addReward() {
-    const name = document.getElementById('reward-name').value;
-    const cost = parseInt(document.getElementById('reward-cost').value);
-    
-    if (!name || isNaN(cost) || cost < 1) {
-        alert("Valid reward name and cost required!");
-        return;
-    }
-    
-    rewards.push({ name, cost });
-    saveRewards();  // Save to localStorage
-    renderRewards();
-
-    document.getElementById('reward-name').value = '';
-    document.getElementById('reward-cost').value = '';
-    toggleRewardForm();
-}
-
-function saveRewards() {
-    localStorage.setItem("rewards", JSON.stringify(rewards));
-}
-
-function loadRewards() {
-    const storedRewards = localStorage.getItem("rewards");
-    if (storedRewards) {
-        rewards = JSON.parse(storedRewards);
-        renderRewards();
-    }
-}
-
-function toggleRewardForm() {
-    const form = document.getElementById('reward-form');
-    form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
-}
-
-
-function redeemReward(index) {
-    if (totalPoints >= rewards[index].cost) {
-        totalPoints -= rewards[index].cost; 
-        savePoints();
-        updatePoints(); 
-        alert(`You redeemed: ${rewards[index].name}!`);
-    } else {
-        alert("Not enough points!");
-    }
-}
-
-
-function savePoints() {
-    localStorage.setItem("points", JSON.stringify(totalPoints));
-}
-
-
-function loadPoints() {
-    const storedPoints = localStorage.getItem("points");
-    if (storedPoints !== null) {
-        totalPoints = JSON.parse(storedPoints);
-    }
-    updatePoints();
-}
-
-
-
-
-
-function renderRewards() {
-    const list = document.getElementById('rewards-list');
-    list.innerHTML = '';
-    rewards.forEach((reward, index) => {
-        list.innerHTML += `
-            <div class="reward-item">
-                <span>${reward.name} - Cost: ${reward.cost} Points</span>
-                <div class="reward-buttons">
-                <button onclick="redeemReward(${index})">Redeem</button>
-                <button onclick="deleteReward(${index})">🗑️ Delete</button>
-                </div>
-            </div>
-        `;
     });
-}
-
-function deleteReward(index) {
-    if (confirm("Are you sure you want to delete this reward?")){
-        rewards.splice(index, 1);
-        saveRewards(); 
-        renderRewards();
-    }
-}
-
-
-function pageLoad() {
-    loadTodos();
-    loadRewards();
-    loadPoints();
-    renderTodos();
-
-    const savedNote = localStorage.getItem("userNote");
-    if (savedNote) {
-        document.getElementById("notebook-text").value = savedNote;
-    }
-
-    const logo = document.getElementById("logo")
-
-    // todo: repair image not loading in electron!!!
-    logo.innerHTML = "<img id='logo-img' src ='logo.png' alt='There should be our logo here but something is broken :('>"
-}
-
-
-function showNotebook() {
-    document.getElementById("notebook-modal").style.display = "block";
-    document.getElementById("overlay-notebook").style.display = "block";
-    
-    // Load saved note
-    const savedNote = localStorage.getItem("userNote");
-    if (savedNote) {
-        document.getElementById("notebook-text").value = savedNote;
-    }
-}
-
-function hideNotebook() {
-    document.getElementById("notebook-modal").style.display = "none";
-    document.getElementById("overlay-notebook").style.display = "none";
-}
-
-function saveNote() {
-    const noteContent = document.getElementById("notebook-text").value;
-    localStorage.setItem("userNote", noteContent);
-    alert("Note saved!");
-}
-
-
+});
     </script>
 </body>
 </html>
