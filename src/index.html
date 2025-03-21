@@ -3,18 +3,263 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gamify Yourself</title>
+    <title>Gamify</title>
     <link rel="stylesheet" href="index.css">
 </head>
-<body>
-    <div class="container">
-        <h1>Gamify Yourself</h1>
-        <div class="points">Points: <span id="points">0</span></div>
-        <input type="text" id="taskInput" placeholder="Enter a task...">
-        <button onclick="addTask()">Add Task</button>
-        <ul id="taskList"></ul>
-        <button onclick="toggleTheme()" class="theme-btn">Toggle Theme</button>
+<body onload="pageLoad()">
+    <h1>Gamify</h1>
+    <button onclick="showModal()">Add New Todo</button>
+    <button onclick="showRewardsTab()">Rewards</button>
+    <h2>Points Earned: <span id="points-counter">0</span></h2>
+    <div id="todo-list"></div>
+
+    <div class="overlay" id="overlay" onclick="hideModal()"></div>
+    <div class="modal" id="todo-modal">
+        <h2>New TODO</h2>
+        <label>Title *</label>
+        <input type="text" id="todo-title"><br>
+        <label>Description (optional)</label>
+        <input type="text" id="todo-desc"><br>
+        <label>Due Date *</label>
+        <input type="datetime-local" id="todo-date"><br>
+        <label>Points (1-5) *</label>
+        <input type="number" id="todo-points" min="1" max="5"><br>
+        <button onclick="addTodo()">Save</button>
+        <button onclick="hideModal()">Cancel</button>
     </div>
-    <script src="script.js"></script>
+
+    <div id="rewards-tab" class="modal">
+        <h2>Rewards</h2>
+        <p>Points Available: <span id="points-counter-rewards">0</span></p>
+        <div id="rewards-list"></div>
+        <div id="reward-form" style="display: none;">
+            <h3>Add New Reward</h3>
+            <input type="text" id="reward-name" placeholder="Reward Name">
+            <input type="number" id="reward-cost" placeholder="Points Cost" min="1">
+            <button onclick="addReward()">Save Reward</button>
+        </div>
+        <button onclick="toggleRewardForm()">Add Reward</button>
+        
+        <button onclick="hideRewardsTab()">Close</button>
+    </div>
+
+    <script>
+         let todos = [];
+        let totalPoints = 0;
+
+        function showModal() {
+            document.getElementById('todo-modal').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+        }
+
+        function hideModal() {
+            document.getElementById('todo-modal').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('rewards-tab').style.display = 'none';
+        }
+
+        function addTodo() {
+        const title = document.getElementById('todo-title').value;
+        const desc = document.getElementById('todo-desc').value;
+        const dueDate = document.getElementById('todo-date').value;
+        const points = parseInt(document.getElementById('todo-points').value);
+
+        if (!title || !dueDate || isNaN(points) || points < 1 || points > 5) {
+            return alert("Title, Due Date, and Points (1-5) are required");
+        }
+
+        const todo = { title, desc, dueDate, points, isCompleted: false };
+        todos.push(todo);
+        saveTodos();  // Save to localStorage
+        renderTodos();
+        hideModal();
+    }
+
+function saveTodos() {
+    localStorage.setItem("todos", JSON.stringify(todos));
+}
+
+
+
+function toggleComplete(index) {
+    todos[index].isCompleted = !todos[index].isCompleted;
+
+    if (todos[index].isCompleted) {
+        totalPoints += todos[index].points;
+    } else {
+        totalPoints -= todos[index].points;
+    }
+
+    saveTodos();
+    savePoints(); 
+    updatePoints(); 
+    renderTodos();
+}
+
+
+
+
+
+    function loadTodos() {
+        const storedTodos = localStorage.getItem("todos");
+        if (storedTodos) {
+            todos = JSON.parse(storedTodos);
+            renderTodos();
+        }
+    }
+    
+    function updatePoints() {
+    document.getElementById('points-counter').innerText = totalPoints;
+    document.getElementById('points-counter-rewards').innerText = totalPoints;
+}
+
+
+
+
+
+        function renderTodos() {
+            const list = document.getElementById('todo-list');
+            list.innerHTML = '';
+            todos.forEach((todo, index) => {
+                list.innerHTML += `
+                    <div class="todo-item ${todo.isCompleted ? 'completed' : ''}">
+                        <span onclick="toggleComplete(${index})">${todo.title} - ${new Date(todo.dueDate).toLocaleString()} (Points: ${todo.points})</span>
+                        <div class='todo_buttons'>
+                        <button onclick="toggleComplete(${index})">${todo.isCompleted ? 'Undo' : 'Complete'}</button>
+                        <button onclick="deleteTodo(${index})">🗑️ Delete</button>
+                        </div>
+                    </div>
+                `;
+            });
+            updatePoints();
+        }
+
+        function deleteTodo(index) {
+    if (confirm("Are you sure you want to delete this task?")) {
+        if (todos[index].isCompleted) {
+            totalPoints -= todos[index].points;
+            savePoints();
+        }
+        
+        todos.splice(index, 1);
+        saveTodos();
+        renderTodos();
+    }
+}
+
+
+        //rewards
+        let rewards = [];
+
+function showRewardsTab() {
+    document.getElementById('rewards-tab').style.display = 'block';
+    document.getElementById('overlay').style.display = 'block';
+    document.getElementById('points-counter-rewards').innerText = totalPoints;
+    renderRewards();
+}
+
+function hideRewardsTab() {
+    document.getElementById('rewards-tab').style.display = 'none';
+    document.getElementById('overlay').style.display = 'none';
+}
+
+function addReward() {
+    const name = document.getElementById('reward-name').value;
+    const cost = parseInt(document.getElementById('reward-cost').value);
+    
+    if (!name || isNaN(cost) || cost < 1) {
+        alert("Valid reward name and cost required!");
+        return;
+    }
+    
+    rewards.push({ name, cost });
+    saveRewards();  // Save to localStorage
+    renderRewards();
+
+    document.getElementById('reward-name').value = '';
+    document.getElementById('reward-cost').value = '';
+    toggleRewardForm();
+}
+
+function saveRewards() {
+    localStorage.setItem("rewards", JSON.stringify(rewards));
+}
+
+function loadRewards() {
+    const storedRewards = localStorage.getItem("rewards");
+    if (storedRewards) {
+        rewards = JSON.parse(storedRewards);
+        renderRewards();
+    }
+}
+
+function toggleRewardForm() {
+    const form = document.getElementById('reward-form');
+    form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
+}
+
+
+function redeemReward(index) {
+    if (totalPoints >= rewards[index].cost) {
+        totalPoints -= rewards[index].cost; 
+        savePoints();
+        updatePoints(); 
+        alert(`You redeemed: ${rewards[index].name}!`);
+    } else {
+        alert("Not enough points!");
+    }
+}
+
+
+function savePoints() {
+    localStorage.setItem("points", JSON.stringify(totalPoints));
+}
+
+
+function loadPoints() {
+    const storedPoints = localStorage.getItem("points");
+    if (storedPoints !== null) {
+        totalPoints = JSON.parse(storedPoints);
+    }
+    updatePoints();
+}
+
+
+
+
+
+function renderRewards() {
+    const list = document.getElementById('rewards-list');
+    list.innerHTML = '';
+    rewards.forEach((reward, index) => {
+        list.innerHTML += `
+            <div class="reward-item">
+                <span>${reward.name} - Cost: ${reward.cost} Points</span>
+                <div class="reward-buttons">
+                <button onclick="redeemReward(${index})">Redeem</button>
+                <button onclick="deleteReward(${index})">🗑️ Delete</button>
+                </div>
+            </div>
+        `;
+    });
+}
+
+function deleteReward(index) {
+    if (confirm("Are you sure you want to delete this reward?")){
+        rewards.splice(index, 1);
+        saveRewards(); 
+        renderRewards();
+    }
+}
+
+
+function pageLoad() {
+    loadTodos();
+    loadRewards();
+    loadPoints();
+    renderTodos();
+}
+
+    </script>
 </body>
 </html>
