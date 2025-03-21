@@ -60,10 +60,9 @@ h2 {
 
 .btn {
     background: #667eea;
-    color: white;
-    padding: 10px;
     border: none;
-    width: 100%;
+    width: fit-content;
+    height: 50px;
     border-radius: 5px;
     cursor: pointer;
     transition: 0.3s;
@@ -71,6 +70,10 @@ h2 {
 
 .btn:hover {
     background: #764ba2;
+}
+
+#login-button{
+    height: 50px;
 }
 
 .register-link {

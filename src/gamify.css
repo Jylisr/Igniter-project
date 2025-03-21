@@ -6,7 +6,7 @@
             background: #D3D3D3;
             color: limegreen;
             text-align: center;
-            margin-top: 10px;
+            margin-top: 60px;
         }
 
         #top-bar {
@@ -24,12 +24,35 @@
             z-index: 1000;
         }
 
+        #coin-counter {
+            width: 200px;
+        }
+
+        #points-counter {
+            position: absolute;
+            top: 33px;
+            left: 85px;
+        }
+
         #todos {
             position: absolute;
             top: 70px;
             left: 20px;
             font-size: 16px;
             z-index: 10;
+            width: 350px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 40px;
+        }
+
+        #mytasks {
+            width: 200px;
+        }
+
+        #add-task {
+            height: fit-content;
         }
 
 
